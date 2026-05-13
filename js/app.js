@@ -5,6 +5,9 @@ import { renderHome } from './screens/home.js';
 import { renderMemoList } from './screens/memo-list.js';
 import { renderMemoDetail } from './screens/memo-detail.js';
 import { renderMemoNew } from './screens/memo-new.js';
+import { renderSceneList } from './screens/scene-list.js';
+import { renderSceneDetail } from './screens/scene-detail.js';
+import { renderSceneNew } from './screens/scene-new.js';
 
 // 라우트 등록
 addRoute('/', () => renderLaunch());
@@ -12,7 +15,9 @@ addRoute('/home', () => renderHome());
 addRoute('/memo', () => renderMemoList());
 addRoute('/memo/new', (_p, q) => renderMemoNew(q.date));
 addRoute('/memo/:id', (p) => renderMemoDetail(p.id));
-addRoute('/scene', () => renderPlaceholder('장면', '사진과 동영상은 다음 단계에서 추가할 예정이에요.'));
+addRoute('/scene', () => renderSceneList());
+addRoute('/scene/new', () => renderSceneNew());
+addRoute('/scene/:id', (p) => renderSceneDetail(p.id));
 addRoute('/url', () => renderPlaceholder('URL', '링크 모아보기는 추후 추가될 예정이에요.'));
 addRoute('/settings', () => renderPlaceholder('설정', '설정 화면은 친구의 추가 기획 후 만들어요.'));
 

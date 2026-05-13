@@ -2,6 +2,7 @@
 import { navigate } from '../router.js';
 import { renderTabbar } from '../app.js';
 import { MemoStore } from '../storage.js';
+import { MediaStore } from '../media-storage.js';
 import {
   buildMonthGrid,
   shiftMonth,
@@ -13,12 +14,19 @@ import {
 // 화면 상태(현재 보고 있는 연/월)
 let currentMonth = todayYearMonth();
 
-export function renderHome() {
+export async function renderHome() {
   const app = document.getElementById('app');
   const monthLabel = toMonthLabel(currentMonth);
   const cells = buildMonthGrid(currentMonth);
-  // 기록 있는 날짜 집합
-  const recordedDates = MemoStore.recordedDatesInMonth(currentMonth);
+  // 기록 있는 날짜 집합 - 메모와 미디어 모두 포함
+  const memoDates = MemoStore.recordedDatesInMonth(currentMonth);
+  let mediaDates = new Set();
+  try {
+    mediaDates = await MediaStore.recordedDatesInMonth(currentMonth);
+  } catch (e) {
+    console.warn('[home] media dates fetch failed:', e);
+  }
+  const recordedDates = new Set([...memoDates, ...mediaDates]);
   const today = todayISO();
 
   app.innerHTML = `

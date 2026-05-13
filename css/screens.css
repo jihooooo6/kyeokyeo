@@ -331,6 +331,200 @@
   opacity: 0.6;
 }
 
+/* ====== K_IOS_APP_GAL_001 장면 전체 화면 ====== */
+.screen-scene-list .scene-body-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink-muted);
+  font-size: 14px;
+}
+
+.screen-scene-list .scene-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-1);
+  padding: 0 var(--space-3) var(--space-5);
+  flex: 1;
+  align-content: start;
+}
+
+.scene-cell {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--color-tint);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.scene-cell img,
+.scene-cell video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.scene-cell .play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%);
+}
+
+.scene-cell .play-overlay svg {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+}
+
+.scene-cell:active { opacity: 0.7; }
+
+/* ====== 장면 상세 (전체화면 뷰) ====== */
+.screen-scene-detail {
+  background: var(--color-bg-scene);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-scene-detail.is-video { background: var(--color-bg-video); }
+
+.screen-scene-detail .scene-detail-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+}
+
+.screen-scene-detail .scene-detail-bar.top {
+  padding-top: max(var(--space-4), env(safe-area-inset-top, var(--space-4)));
+}
+
+.screen-scene-detail .back-btn {
+  color: #fff;
+  font-size: 16px;
+}
+
+.screen-scene-detail .scene-detail-media {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) 0;
+  overflow: hidden;
+}
+
+.screen-scene-detail .scene-detail-media img,
+.screen-scene-detail .scene-detail-media video {
+  max-width: 100%;
+  max-height: 70vh;
+  display: block;
+  object-fit: contain;
+}
+
+.screen-scene-detail .scene-detail-bar.bottom {
+  justify-content: flex-start;
+  padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, var(--space-4)));
+}
+
+.screen-scene-detail .date-trigger {
+  position: relative;
+  color: #e2dffa;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.screen-scene-detail .date-trigger input[type="date"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+/* ====== K_IOS_APP_GAL_002 장면 추가 ====== */
+.screen-scene-new {
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-scene-new .scene-new-preview {
+  height: 280px;
+  margin: var(--space-4) var(--space-5) 0;
+  border-radius: var(--radius-md);
+  background: var(--color-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.screen-scene-new .scene-new-preview .preview-hint {
+  color: var(--color-ink-muted);
+  font-size: 13px;
+  padding: 0 var(--space-5);
+  text-align: center;
+}
+
+.screen-scene-new .scene-new-preview img,
+.screen-scene-new .scene-new-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.screen-scene-new .scene-new-options {
+  padding: var(--space-6) var(--space-5);
+}
+
+.screen-scene-new .section-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+.screen-scene-new .scene-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  cursor: pointer;
+  color: var(--color-ink);
+  font-size: 16px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.screen-scene-new .scene-option .icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink);
+}
+
+.screen-scene-new .scene-option:active { background: var(--color-tint); }
+
+.screen-scene-new .scene-permission-hint {
+  margin-top: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-tint);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent-deep);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 /* ====== 준비중 화면 (자리 차지용) ====== */
 .screen-placeholder {
   display: flex;
