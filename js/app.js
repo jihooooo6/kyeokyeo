@@ -47,7 +47,16 @@ export function renderTabbar() {
   `;
 }
 
-// 탭바 클릭 (해시 변경 시 자동 라우팅 - 별도 핸들러 필요 없음)
+// 탭바 클릭 - 이미 활성 탭을 다시 눌러도 재렌더가 되도록 navigate() 경유
+document.body.addEventListener('click', (e) => {
+  const link = e.target.closest('.tabbar a');
+  if (!link) return;
+  const href = link.getAttribute('href') || '';
+  if (!href.startsWith('#')) return;
+  e.preventDefault();
+  navigate(href.slice(1));
+});
+
 export function bindTabbar() {}
 
 // 토스트 알럿 - "저장 되었습니다", "삭제 되었습니다"
