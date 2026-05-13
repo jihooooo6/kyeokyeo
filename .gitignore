@@ -7,6 +7,9 @@ my-answer/
 # 친구가 보낸 원본 디자인 에셋(분석 후 가공본만 assets/로 옮겨 공개)
 add-custom/
 
+# AI(Claude) 프로젝트 컨텍스트 - 작업 이력·내부 정책 포함, 비공개
+CLAUDE.md
+
 # 에디터 / 시스템
 .idea/
 .vscode/
