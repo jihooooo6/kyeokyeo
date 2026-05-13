@@ -1,0 +1,19 @@
+# 기획서 PDF (친구 작업물, 비공개)
+*.pdf
+
+# 내부 작업 자료 (계획서, 분석, 쿼리 요청 등)
+my-answer/
+
+# 에디터 / 시스템
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (혹시 나중에 도입되더라도 빌드 산출물 제외)
+node_modules/
+dist/
+
+# 로그
+*.log

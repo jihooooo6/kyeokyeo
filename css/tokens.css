@@ -1,0 +1,49 @@
+/* 켜켜 디자인 토큰 - 기획서 v1.1 색상 명세 */
+:root {
+  /* 배경 */
+  --color-bg-ivory: #F5F0E8;
+  --color-bg-app: #FFFFFF;
+  --color-bg-scene: #2E2B3D;
+  --color-bg-video: #000000;
+
+  /* 포인트 */
+  --color-accent-deep: #5C52B8;
+  --color-accent: #7F77DD;
+  --color-tint: #EEEDFE;
+
+  /* 텍스트 */
+  --color-ink: #1F1B2E;
+  --color-ink-muted: #6B6480;
+  --color-ink-on-accent: #FFFFFF;
+
+  /* 시스템 */
+  --color-danger: #E0455B;
+  --color-line: #E4E0EC;
+  --color-dim: rgba(0, 0, 0, 0.55);
+
+  /* 폰트 */
+  --font-base: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+               "Noto Sans KR", "맑은 고딕", "Malgun Gothic", sans-serif;
+
+  /* 간격 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* 라운드 */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* 그림자 */
+  --shadow-1: 0 2px 8px rgba(92, 82, 184, 0.08);
+  --shadow-2: 0 4px 16px rgba(92, 82, 184, 0.12);
+
+  /* 레이아웃 */
+  --tabbar-height: 64px;
+  --header-height: 56px;
+}
