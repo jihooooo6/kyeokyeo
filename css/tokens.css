@@ -11,6 +11,14 @@
   --color-accent: #7F77DD;
   --color-tint: #EEEDFE;
 
+  /* 타입 뱃지 (v1.2 신규) - 메모/장면/URL 구분 */
+  --color-badge-memo-bg: #EEEDFE;
+  --color-badge-memo-ink: #5C52B8;
+  --color-badge-scene-bg: #E1F5EE;
+  --color-badge-scene-ink: #2A7A5E;
+  --color-badge-url-bg: #E6F1FB;
+  --color-badge-url-ink: #2D6FB0;
+
   /* 텍스트 */
   --color-ink: #1F1B2E;
   --color-ink-muted: #6B6480;

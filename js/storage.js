@@ -41,6 +41,14 @@ export const MemoStore = {
     return loadAll().find((m) => m.id === id) || null;
   },
 
+  // 특정 날짜의 가장 최신 1건 (오늘 요약 영역용)
+  latestOnDate(date) {
+    const same = loadAll()
+      .filter((m) => m.date === date)
+      .sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
+    return same[0] || null;
+  },
+
   // 메모 생성
   create({ date, content }) {
     const memos = loadAll();

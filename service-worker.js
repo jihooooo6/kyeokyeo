@@ -1,5 +1,5 @@
 /* 켜켜 서비스 워커 - 정적 자원 캐싱 */
-const CACHE_VERSION = 'kyeokyeo-v2';
+const CACHE_VERSION = 'kyeokyeo-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -11,7 +11,9 @@ const ASSETS = [
   './js/router.js',
   './js/storage.js',
   './js/media-storage.js',
+  './js/url-storage.js',
   './js/date-utils.js',
+  './js/components/bottom-sheet.js',
   './js/screens/launch.js',
   './js/screens/home.js',
   './js/screens/memo-list.js',
@@ -19,7 +21,8 @@ const ASSETS = [
   './js/screens/memo-new.js',
   './js/screens/scene-list.js',
   './js/screens/scene-detail.js',
-  './js/screens/scene-new.js'
+  './js/screens/scene-new.js',
+  './js/screens/url-new.js'
 ];
 
 self.addEventListener('install', (event) => {

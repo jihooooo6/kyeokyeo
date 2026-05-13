@@ -62,6 +62,30 @@ export const MediaStore = {
     return req2promise(store.get(id));
   },
 
+  // 특정 날짜의 가장 최신 1건 (오늘 요약 영역용)
+  async latestOnDate(date) {
+    const store = await tx();
+    return new Promise((resolve, reject) => {
+      let latest = null;
+      const cursorReq = store.openCursor();
+      cursorReq.onerror = () => reject(cursorReq.error);
+      cursorReq.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (!cursor) {
+          resolve(latest);
+          return;
+        }
+        const v = cursor.value;
+        if (v.date === date) {
+          const vTs = v.updatedAt || v.createdAt;
+          const ltTs = latest && (latest.updatedAt || latest.createdAt);
+          if (!latest || vTs > ltTs) latest = v;
+        }
+        cursor.continue();
+      };
+    });
+  },
+
   // 특정 연/월(YYYY-MM)에 속하는 미디어 (createdAt 내림차순)
   async listByMonth(yyyymm) {
     const store = await tx();
