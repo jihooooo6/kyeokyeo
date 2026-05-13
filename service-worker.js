@@ -1,5 +1,5 @@
 /* 켜켜 서비스 워커 - 정적 자원 캐싱 */
-const CACHE_VERSION = 'kyeokyeo-v3';
+const CACHE_VERSION = 'kyeokyeo-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,8 @@ const ASSETS = [
   './css/tokens.css',
   './css/base.css',
   './css/screens.css',
+  './js/vendor/lottie.min.js',
+  './assets/lottie/kyeokyeo-logo.json',
   './js/app.js',
   './js/router.js',
   './js/storage.js',

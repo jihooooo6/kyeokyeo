@@ -32,24 +32,19 @@
 
 .screen-launch .logo-slot {
   position: absolute;
-  bottom: 15%;
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: var(--color-tint);
+  bottom: 12%;
+  width: 160px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.85;
+  overflow: hidden;
 }
 
-.screen-launch .logo-slot::after {
-  content: "";
-  width: 60%;
-  height: 60%;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-deep) 100%);
-  opacity: 0.4;
+.screen-launch .logo-slot svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* ====== K_IOS_APP_MAN_002 v1.2: 오늘 기록 요약 영역 ====== */
