@@ -205,23 +205,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-5);
+  gap: var(--space-3);
   grid-column: 2;
-}
-
-.screen-home .top-bar .month-nav-inline button {
-  width: 32px;
-  height: 32px;
-  color: var(--color-ink-muted);
-  font-size: 18px;
 }
 
 .screen-home .top-bar .month-label {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   min-width: 90px;
   text-align: center;
   cursor: pointer;
+  letter-spacing: 0.3px;
+  color: var(--color-ink);
+}
+
+.screen-home .top-bar .month-label:hover {
+  color: var(--color-accent-deep);
 }
 
 .screen-home .settings-btn {

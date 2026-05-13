@@ -29,9 +29,13 @@ export async function renderSceneList() {
         <div style="width:24px"></div>
       </div>
       <div class="month-nav">
-        <button id="prev-month" aria-label="이전 달">&lt;</button>
+        <button class="chev-btn" id="prev-month" aria-label="이전 달">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
         <div class="month-label">${toMonthLabel(currentMonth)}</div>
-        <button id="next-month" aria-label="다음 달">&gt;</button>
+        <button class="chev-btn" id="next-month" aria-label="다음 달">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
       </div>
       <div id="scene-body" class="scene-body-loading">불러오는 중...</div>
       <button class="fab" id="add-scene" aria-label="장면 추가">+</button>
