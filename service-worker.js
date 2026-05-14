@@ -1,5 +1,5 @@
 /* 켜켜 서비스 워커 - 정적 자원 캐싱 */
-const CACHE_VERSION = 'kyeokyeo-v8';
+const CACHE_VERSION = 'kyeokyeo-v9';
 const ASSETS = [
   './',
   './index.html',

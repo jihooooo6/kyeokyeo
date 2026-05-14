@@ -36,6 +36,11 @@ export const UrlStore = {
     return this.list().filter((u) => u.date.startsWith(yyyymm));
   },
 
+  // 특정 일자(YYYY-MM-DD)의 URL 목록 (최근 작성 순)
+  listByDate(iso) {
+    return this.list().filter((u) => u.date === iso);
+  },
+
   // 특정 날짜의 가장 최신 1건 (오늘 요약 영역용)
   latestOnDate(date) {
     const same = loadAll()
