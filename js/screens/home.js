@@ -1,10 +1,11 @@
-/* 켜켜 - K_IOS_APP_MAN_002 메인 캘린더 (v1.2: 오늘 기록 요약 영역 추가) */
+/* 켜켜 - K_IOS_APP_MAN_002 메인 캘린더 (v1.2.1 수정사항 반영) */
 import { navigate } from '../router.js';
 import { renderTabbar } from '../app.js';
 import { MemoStore } from '../storage.js';
 import { MediaStore, blobToObjectURL, revokeObjectURL } from '../media-storage.js';
 import { UrlStore } from '../url-storage.js';
 import { openBottomSheet } from '../components/bottom-sheet.js';
+import { openMonthPicker } from '../components/month-picker.js';
 import {
   buildMonthGrid,
   shiftMonth,
@@ -13,10 +14,8 @@ import {
   toMonthLabel
 } from '../date-utils.js';
 
-// 화면 상태(현재 보고 있는 연/월)
+// 화면 상태(현재 보고 있는 연/월) - 진입 시 매번 오늘 기준으로 리셋
 let currentMonth = todayYearMonth();
-
-// 미리 만든 object URL을 해제하기 위한 목록
 let activeUrls = [];
 
 function clearActiveUrls() {
@@ -24,7 +23,13 @@ function clearActiveUrls() {
   activeUrls = [];
 }
 
-export async function renderHome() {
+// 외부 진입(라우트 매칭)용 - currentMonth를 오늘 기준으로 리셋
+export function renderHome() {
+  currentMonth = todayYearMonth();
+  return paint();
+}
+
+async function paint() {
   clearActiveUrls();
   const app = document.getElementById('app');
   const monthLabel = toMonthLabel(currentMonth);
@@ -42,7 +47,7 @@ export async function renderHome() {
   const urlDates = UrlStore.recordedDatesInMonth(currentMonth);
   const recordedDates = new Set([...memoDates, ...mediaDates, ...urlDates]);
 
-  // 오늘 기록 최신 1건씩 (v1.2 신규)
+  // 오늘 기록 최신 1건씩
   const memo = MemoStore.latestOnDate(today);
   let media = null;
   try {
@@ -59,24 +64,8 @@ export async function renderHome() {
 
   app.innerHTML = `
     <div class="screen-home screen">
-      <div class="today-summary" id="today-summary">
-        ${summaryItems.length === 0
-          ? renderEmptySummary()
-          : renderSummaryCards(summaryItems)
-        }
-      </div>
-
-      <div class="top-bar">
-        <div></div>
-        <div class="month-nav-inline">
-          <button class="chev-btn" id="prev-month" aria-label="이전 달">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          </button>
-          <div class="month-label" id="month-label">${monthLabel}</div>
-          <button class="chev-btn" id="next-month" aria-label="다음 달">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
-        </div>
+      <div class="screen-top-bar">
+        <div class="spacer"></div>
         <button class="settings-btn" id="settings-btn" aria-label="설정">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
@@ -85,12 +74,29 @@ export async function renderHome() {
         </button>
       </div>
 
+      <div class="today-summary" id="today-summary">
+        ${summaryItems.length === 0
+          ? renderEmptySummary()
+          : renderSummaryCards(summaryItems)
+        }
+      </div>
+
+      <div class="month-nav home-month-nav">
+        <button class="chev-btn" id="prev-month" aria-label="이전 달">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="month-label" id="month-label">${monthLabel}</div>
+        <button class="chev-btn" id="next-month" aria-label="다음 달">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
       <div class="calendar">
         <div class="weekdays">
-          <div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div>일</div>
+          <div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div><div class="sun">일</div>
         </div>
         <div class="days">
-          ${cells.map((c) => renderDayCell(c, recordedDates, today)).join('')}
+          ${cells.map((c, i) => renderDayCell(c, recordedDates, today, i)).join('')}
         </div>
       </div>
     </div>
@@ -101,13 +107,18 @@ export async function renderHome() {
   // 이벤트 바인딩
   document.getElementById('prev-month').addEventListener('click', () => {
     currentMonth = shiftMonth(currentMonth, -1);
-    renderHome();
+    paint();
   });
   document.getElementById('next-month').addEventListener('click', () => {
     currentMonth = shiftMonth(currentMonth, 1);
-    renderHome();
+    paint();
   });
-  document.getElementById('month-label').addEventListener('click', openMonthPicker);
+  document.getElementById('month-label').addEventListener('click', () => {
+    openMonthPicker(currentMonth, (ym) => {
+      currentMonth = ym;
+      paint();
+    });
+  });
   document.getElementById('settings-btn').addEventListener('click', () => {
     navigate('/settings');
   });
@@ -115,7 +126,7 @@ export async function renderHome() {
   // 빈 상태 추가 버튼 → 바텀 시트
   const emptyAddBtn = document.getElementById('summary-empty-add');
   if (emptyAddBtn) {
-    emptyAddBtn.addEventListener('click', openAddBottomSheet);
+    emptyAddBtn.addEventListener('click', () => openAddBottomSheet(today));
   }
 
   // 요약 카드 클릭 → 해당 타입 상세로 이동
@@ -126,20 +137,23 @@ export async function renderHome() {
     });
   });
 
-  // 날짜 셀 클릭 → 임시로 새 메모 작성 (캘린더 상세 미정의)
+  // 날짜 셀 클릭 → 메모/장면/URL 중 선택 (캘린더 상세 미정의)
   document.querySelectorAll('.calendar .day[data-date]').forEach((el) => {
     el.addEventListener('click', () => {
       const d = el.getAttribute('data-date');
-      navigate('/memo/new?date=' + encodeURIComponent(d));
+      openAddBottomSheet(d);
     });
   });
 }
 
-function renderDayCell(cell, recordedDates, todayIso) {
+function renderDayCell(cell, recordedDates, todayIso, idx) {
+  // 7열 그리드 - 마지막 컬럼(인덱스 % 7 === 6)이 일요일
+  const isSunday = (idx % 7) === 6;
   if (cell.date === null) {
-    return `<div class="day empty"></div>`;
+    return `<div class="day empty ${isSunday ? 'sun' : ''}"></div>`;
   }
   const classes = ['day'];
+  if (isSunday) classes.push('sun');
   if (recordedDates.has(cell.date)) classes.push('has-record');
   if (cell.date === todayIso) classes.push('today');
   return `<div class="${classes.join(' ')}" data-date="${cell.date}">${cell.day}</div>`;
@@ -202,51 +216,27 @@ function renderSummaryCard({ type, data }) {
   return '';
 }
 
-function openAddBottomSheet() {
-  const today = todayISO();
+function openAddBottomSheet(date) {
   openBottomSheet({
     title: '무엇을 기록할까요?',
     actions: [
       {
         label: '메모',
         sublabel: '오늘 있었던 일을 글로',
-        onClick: () => navigate('/memo/new?date=' + encodeURIComponent(today))
+        onClick: () => navigate('/memo/new?date=' + encodeURIComponent(date))
       },
       {
         label: '장면',
         sublabel: '사진이나 동영상으로',
-        onClick: () => navigate('/scene/new')
+        onClick: () => navigate('/scene/new?date=' + encodeURIComponent(date))
       },
       {
         label: 'URL',
         sublabel: '오늘 본 링크 저장',
-        onClick: () => navigate('/url/new?date=' + encodeURIComponent(today))
+        onClick: () => navigate('/url/new?date=' + encodeURIComponent(date))
       }
     ]
   });
-}
-
-function openMonthPicker() {
-  const input = document.createElement('input');
-  input.type = 'month';
-  input.value = currentMonth;
-  input.style.position = 'fixed';
-  input.style.opacity = '0';
-  input.style.left = '-9999px';
-  document.body.appendChild(input);
-  input.addEventListener('change', () => {
-    if (input.value) {
-      currentMonth = input.value;
-      renderHome();
-    }
-    document.body.removeChild(input);
-  });
-  if (typeof input.showPicker === 'function') {
-    try { input.showPicker(); }
-    catch (e) { input.click(); }
-  } else {
-    input.click();
-  }
 }
 
 function escapeHtml(str) {

@@ -2,6 +2,7 @@
 import { navigate } from '../router.js';
 import { renderTabbar } from '../app.js';
 import { MediaStore, blobToObjectURL, revokeObjectURL } from '../media-storage.js';
+import { openMonthPicker } from '../components/month-picker.js';
 import {
   shiftMonth,
   todayYearMonth,
@@ -18,7 +19,13 @@ function clearActiveUrls() {
   activeUrls = [];
 }
 
-export async function renderSceneList() {
+// 외부 진입(라우트 매칭)용 - currentMonth를 오늘 기준으로 리셋
+export function renderSceneList() {
+  currentMonth = todayYearMonth();
+  return paint();
+}
+
+async function paint() {
   clearActiveUrls();
   const app = document.getElementById('app');
   // 진입 직후 즉시 골격을 그려서 빈 화면을 막음
@@ -32,7 +39,7 @@ export async function renderSceneList() {
         <button class="chev-btn" id="prev-month" aria-label="이전 달">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        <div class="month-label">${toMonthLabel(currentMonth)}</div>
+        <div class="month-label" id="month-label">${toMonthLabel(currentMonth)}</div>
         <button class="chev-btn" id="next-month" aria-label="다음 달">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
@@ -45,11 +52,17 @@ export async function renderSceneList() {
 
   document.getElementById('prev-month').addEventListener('click', () => {
     currentMonth = shiftMonth(currentMonth, -1);
-    renderSceneList();
+    paint();
   });
   document.getElementById('next-month').addEventListener('click', () => {
     currentMonth = shiftMonth(currentMonth, 1);
-    renderSceneList();
+    paint();
+  });
+  document.getElementById('month-label').addEventListener('click', () => {
+    openMonthPicker(currentMonth, (ym) => {
+      currentMonth = ym;
+      paint();
+    });
   });
   document.getElementById('add-scene').addEventListener('click', () => {
     navigate('/scene/new');

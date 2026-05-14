@@ -1,10 +1,18 @@
-/* 켜켜 - K_IOS_APP_GAL_002 장면 추가 */
+/* 켜켜 - K_IOS_APP_GAL_002 장면 추가 (v1.2.1: 단일 진입점) */
 import { navigate } from '../router.js';
 import { renderTabbar, showToast } from '../app.js';
 import { MediaStore } from '../media-storage.js';
 import { todayISO } from '../date-utils.js';
 
-export function renderSceneNew() {
+/**
+ * 장면 추가 화면
+ * 기존 카메라/갤러리 두 버튼이 iOS 네이티브 메뉴(보관함/촬영/파일)와 중복돼서
+ * 단일 진입점(`장면 추가하기`)으로 통합. accept="image/*,video/*" 만 두면
+ * iOS가 알아서 보관함/촬영/파일을 골라서 띄움.
+ * @param {string} [dateParam] - 캘린더에서 날짜를 골라 진입한 경우의 ISO 날짜
+ */
+export function renderSceneNew(dateParam) {
+  const targetDate = dateParam || todayISO();
   const app = document.getElementById('app');
   app.innerHTML = `
     <div class="screen-scene-new screen">
@@ -15,18 +23,7 @@ export function renderSceneNew() {
       <div class="scene-new-options">
         <div class="section-title">장면 추가</div>
 
-        <label class="scene-option" for="camera-input">
-          <span class="icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-              <circle cx="12" cy="13" r="4"></circle>
-            </svg>
-          </span>
-          <span class="label">카메라로 찍기</span>
-          <input id="camera-input" type="file" accept="image/*,video/*" capture="environment" hidden>
-        </label>
-
-        <label class="scene-option" for="gallery-input">
+        <label class="scene-option" for="media-input">
           <span class="icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2"></rect>
@@ -34,24 +31,25 @@ export function renderSceneNew() {
               <path d="M21 15l-5-5L5 21"></path>
             </svg>
           </span>
-          <span class="label">갤러리에서 가져오기</span>
-          <input id="gallery-input" type="file" accept="image/*,video/*" hidden>
+          <span class="label">장면 추가하기</span>
+          <input id="media-input" type="file" accept="image/*,video/*" hidden>
         </label>
 
         <p class="scene-permission-hint">
-          최초 선택 시 브라우저가 카메라/사진 접근 권한을 요청할 수 있어요. 거부하면 설정에서 권한을 허용해야 사용할 수 있습니다.
+          탭하면 사진 보관함 / 촬영 / 파일 선택을 한 화면에서 고를 수 있어요.
+          최초 1회 사진/카메라 접근 권한이 필요해요.
         </p>
       </div>
     </div>
     ${renderTabbar()}
   `;
 
-  ['camera-input', 'gallery-input'].forEach((inputId) => {
-    document.getElementById(inputId).addEventListener('change', (e) => handleFile(e.target.files));
+  document.getElementById('media-input').addEventListener('change', (e) => {
+    handleFile(e.target.files, targetDate);
   });
 }
 
-async function handleFile(files) {
+async function handleFile(files, targetDate) {
   if (!files || !files[0]) return;
   const file = files[0];
   const type = file.type.startsWith('video/') ? 'video' :
@@ -71,7 +69,7 @@ async function handleFile(files) {
   try {
     // 파일 자체를 그대로 Blob으로 저장 (File은 Blob의 서브클래스)
     await MediaStore.create({
-      date: todayISO(),
+      date: targetDate,
       type,
       blob: file,
       mimeType: file.type

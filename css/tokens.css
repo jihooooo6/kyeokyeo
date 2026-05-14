@@ -29,6 +29,9 @@
   --color-line: #E4E0EC;
   --color-dim: rgba(0, 0, 0, 0.55);
 
+  /* 캘린더 - 일요일 (v1.2.1 수정사항) */
+  --color-sunday: #E8736A;
+
   /* 폰트 */
   --font-base: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
                "Noto Sans KR", "맑은 고딕", "Malgun Gothic", sans-serif;

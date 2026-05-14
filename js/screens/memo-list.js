@@ -2,6 +2,7 @@
 import { navigate } from '../router.js';
 import { renderTabbar } from '../app.js';
 import { MemoStore } from '../storage.js';
+import { openMonthPicker } from '../components/month-picker.js';
 import {
   shiftMonth,
   todayYearMonth,
@@ -11,7 +12,13 @@ import {
 
 let currentMonth = todayYearMonth();
 
+// 외부 진입(라우트 매칭)용 - currentMonth를 오늘 기준으로 리셋
 export function renderMemoList() {
+  currentMonth = todayYearMonth();
+  paint();
+}
+
+function paint() {
   const app = document.getElementById('app');
   // 현재 월의 메모 카드 목록 (최근 작성 순)
   const memos = MemoStore.listByMonth(currentMonth);
@@ -27,7 +34,7 @@ export function renderMemoList() {
         <button class="chev-btn" id="prev-month" aria-label="이전 달">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        <div class="month-label">${toMonthLabel(currentMonth)}</div>
+        <div class="month-label" id="month-label">${toMonthLabel(currentMonth)}</div>
         <button class="chev-btn" id="next-month" aria-label="다음 달">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
@@ -47,11 +54,17 @@ export function renderMemoList() {
 
   document.getElementById('prev-month').addEventListener('click', () => {
     currentMonth = shiftMonth(currentMonth, -1);
-    renderMemoList();
+    paint();
   });
   document.getElementById('next-month').addEventListener('click', () => {
     currentMonth = shiftMonth(currentMonth, 1);
-    renderMemoList();
+    paint();
+  });
+  document.getElementById('month-label').addEventListener('click', () => {
+    openMonthPicker(currentMonth, (ym) => {
+      currentMonth = ym;
+      paint();
+    });
   });
   document.getElementById('add-memo').addEventListener('click', () => {
     navigate('/memo/new');

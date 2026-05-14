@@ -1,5 +1,5 @@
 /* 켜켜 서비스 워커 - 정적 자원 캐싱 */
-const CACHE_VERSION = 'kyeokyeo-v4';
+const CACHE_VERSION = 'kyeokyeo-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const ASSETS = [
   './js/url-storage.js',
   './js/date-utils.js',
   './js/components/bottom-sheet.js',
+  './js/components/month-picker.js',
   './js/screens/launch.js',
   './js/screens/home.js',
   './js/screens/memo-list.js',
