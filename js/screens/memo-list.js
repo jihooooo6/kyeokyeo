@@ -2,7 +2,7 @@
 import { navigate } from '../router.js';
 import { renderTabbar } from '../app.js';
 import { MemoStore } from '../storage.js';
-import { openMonthPicker } from '../components/month-picker.js';
+import { openDatePicker } from '../components/date-picker.js';
 import {
   shiftMonth,
   todayYearMonth,
@@ -61,8 +61,8 @@ function paint() {
     paint();
   });
   document.getElementById('month-label').addEventListener('click', () => {
-    openMonthPicker(currentMonth, (ym) => {
-      currentMonth = ym;
+    openDatePicker(currentMonth + '-01', (iso) => {
+      currentMonth = iso.substring(0, 7);
       paint();
     });
   });

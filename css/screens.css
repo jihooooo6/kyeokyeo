@@ -880,8 +880,8 @@
 
 .bottom-sheet-cancel:active { background: var(--color-tint); }
 
-/* ====== 연/월 선택 모달 (v1.2.1 자체 구현) ====== */
-.month-picker-overlay {
+/* ====== 날짜 선택 모달 (v1.2.2 캘린더 그리드 - 일자까지 선택) ====== */
+.date-picker-overlay {
   position: fixed;
   inset: 0;
   background: var(--color-dim);
@@ -895,14 +895,14 @@
   padding: var(--space-5);
 }
 
-.month-picker-overlay.show {
+.date-picker-overlay.show {
   opacity: 1;
   pointer-events: auto;
 }
 
-.month-picker-panel {
+.date-picker-panel {
   width: 100%;
-  max-width: 320px;
+  max-width: 340px;
   background: var(--color-bg-app);
   border-radius: var(--radius-md);
   padding: var(--space-4) var(--space-4) var(--space-3);
@@ -910,67 +910,118 @@
   transition: transform 0.2s ease;
 }
 
-.month-picker-overlay.show .month-picker-panel {
+.date-picker-overlay.show .date-picker-panel {
   transform: translateY(0);
 }
 
-.month-picker-head {
+.date-picker-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-3);
 }
 
-.month-picker-year {
-  font-size: 18px;
+.date-picker-month {
+  font-size: 17px;
   font-weight: 700;
   color: var(--color-accent-deep);
   letter-spacing: 0.5px;
 }
 
-.month-picker-grid {
+.date-picker-weekdays {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-ink);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.date-picker-weekdays .sun {
+  color: var(--color-sunday);
+}
+
+.date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
   margin-bottom: var(--space-3);
 }
 
-.month-cell {
-  height: 44px;
-  border-radius: var(--radius-sm);
-  background: var(--color-tint);
-  color: var(--color-ink);
-  font-size: 15px;
-  font-weight: 500;
+.date-cell {
+  aspect-ratio: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
+  color: var(--color-ink);
+  background: transparent;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
-.month-cell:hover {
-  background: #e3e1f5;
+.date-cell.empty {
+  color: transparent;
+  pointer-events: none;
 }
 
-.month-cell.selected {
+.date-cell.sun {
+  color: var(--color-sunday);
+}
+
+.date-cell:hover {
+  background: var(--color-tint);
+}
+
+.date-cell.today {
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.date-cell.selected {
   background: var(--color-accent);
   color: #fff;
   font-weight: 700;
 }
 
-.month-picker-cancel {
-  width: 100%;
+.date-cell.selected.sun {
+  background: var(--color-sunday);
+  color: #fff;
+}
+
+.date-picker-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.date-picker-today,
+.date-picker-cancel {
   height: 44px;
   border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.date-picker-today {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.date-picker-today:active {
+  background: var(--color-accent-deep);
+}
+
+.date-picker-cancel {
   background: var(--color-bg-app);
   border: 1px solid var(--color-line);
-  font-size: 15px;
   color: var(--color-ink);
   font-weight: 500;
 }
 
-.month-picker-cancel:active {
+.date-picker-cancel:active {
   background: var(--color-tint);
 }
 

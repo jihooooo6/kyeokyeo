@@ -5,7 +5,7 @@ import { MemoStore } from '../storage.js';
 import { MediaStore, blobToObjectURL, revokeObjectURL } from '../media-storage.js';
 import { UrlStore } from '../url-storage.js';
 import { openBottomSheet } from '../components/bottom-sheet.js';
-import { openMonthPicker } from '../components/month-picker.js';
+import { openDatePicker } from '../components/date-picker.js';
 import {
   buildMonthGrid,
   shiftMonth,
@@ -114,8 +114,10 @@ async function paint() {
     paint();
   });
   document.getElementById('month-label').addEventListener('click', () => {
-    openMonthPicker(currentMonth, (ym) => {
-      currentMonth = ym;
+    // 현재 보고 있는 달의 1일을 기준으로 데이트 피커 오픈
+    openDatePicker(currentMonth + '-01', (iso) => {
+      // 선택한 날짜가 속한 달로 캘린더 이동 (일 정보는 부수적)
+      currentMonth = iso.substring(0, 7);
       paint();
     });
   });
