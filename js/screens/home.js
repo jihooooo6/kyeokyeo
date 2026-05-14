@@ -6,6 +6,7 @@ import { MediaStore, blobToObjectURL, revokeObjectURL } from '../media-storage.j
 import { UrlStore } from '../url-storage.js';
 import { openBottomSheet } from '../components/bottom-sheet.js';
 import { openDatePicker } from '../components/date-picker.js';
+import { openLinkEditSheet } from '../components/link-edit-sheet.js';
 import {
   buildMonthGrid,
   shiftMonth,
@@ -209,8 +210,8 @@ function renderSummaryCard({ type, data }) {
   if (type === 'url') {
     const display = data.title ? data.title : data.url;
     return `
-      <div class="summary-card type-url" data-route="/url">
-        <span class="type-badge url">URL</span>
+      <div class="summary-card type-url" data-route="/url/${data.id}">
+        <span class="type-badge url">링크</span>
         <div class="summary-body url-line">${escapeHtml(display)}</div>
       </div>
     `;
@@ -233,9 +234,12 @@ function openAddBottomSheet(date) {
         onClick: () => navigate('/scene/new?date=' + encodeURIComponent(date))
       },
       {
-        label: 'URL',
-        sublabel: '오늘 본 링크 저장',
-        onClick: () => navigate('/url/new?date=' + encodeURIComponent(date))
+        label: '링크',
+        sublabel: '오늘 본 페이지 저장',
+        onClick: () => openLinkEditSheet({
+          initialDate: date,
+          onSaved: () => paint()
+        })
       }
     ]
   });

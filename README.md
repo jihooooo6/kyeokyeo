@@ -16,10 +16,10 @@
 
 | 영역 | 내용 |
 |------|------|
-| 메인(캘린더) | 오늘 기록 요약(메모/장면/URL 최신 1건씩) + 월별 캘린더. 기록이 있는 날엔 도트 표시 |
-| 메모 | 첫 줄을 자동으로 제목 처리. 월별 카드 리스트 |
-| 장면 | 사진·동영상 3×3 그리드. 카메라/갤러리에서 즉시 추가 |
-| URL | 링크를 날짜와 함께 저장. 짧은 메모 첨부 가능 |
+| 메인(캘린더) | 오늘 기록 요약(메모/장면/링크 최신 1건씩) + 월별 캘린더. 기록이 있는 날엔 도트 표시 |
+| 메모 | 첫 줄을 자동으로 제목 처리. 일별 카드 리스트(좌/우로 일 이동) |
+| 장면 | 사진·동영상 3×3 그리드(일별). 갤러리/카메라 선택 후 미리보기 컨펌 |
+| 링크 | 페이지 타이틀 + URL + 날짜로 저장. 인앱 브라우저에서 페이지 열람, 공유, 수정/삭제 |
 | 빈 상태 | 오늘 기록이 없으면 + 버튼 한 번으로 바텀 시트에서 종류 선택 |
 | 오프라인 | PWA Service Worker로 정적 자원 캐싱. 비행기 모드에서도 동작 |
 
@@ -33,7 +33,7 @@
 |--------|------|
 | 메모 | 브라우저의 localStorage |
 | 사진·동영상 | 브라우저의 IndexedDB (Blob 그대로) |
-| URL | 브라우저의 localStorage |
+| 링크 | 브라우저의 localStorage |
 
 같은 PC + 같은 브라우저로 다시 접속해야 자기 기록이 보입니다. 다른 브라우저나 다른 PC에는 동기화되지 않습니다.
 
@@ -73,17 +73,20 @@ make-won-app/
    ├─ vendor/
    │  └─ lottie.min.js        # Lottie 라이브러리
    ├─ components/
-   │  └─ bottom-sheet.js      # 바텀 시트 컴포넌트
+   │  ├─ bottom-sheet.js      # 바텀 시트 컴포넌트
+   │  ├─ date-picker.js       # 자체 데이트 피커 (캘린더 그리드)
+   │  └─ link-edit-sheet.js   # 링크 추가/수정 시트
    └─ screens/
       ├─ launch.js            # 런치 스크린
       ├─ home.js              # 메인 (캘린더 + 오늘 요약)
-      ├─ memo-list.js         # 메모 전체
+      ├─ memo-list.js         # 메모 전체 (일별)
       ├─ memo-detail.js       # 메모 상세
       ├─ memo-new.js          # 새 메모 작성
-      ├─ scene-list.js        # 장면 그리드
+      ├─ scene-list.js        # 장면 그리드 (일별)
       ├─ scene-detail.js      # 장면 전체화면 뷰
-      ├─ scene-new.js         # 장면 추가
-      └─ url-new.js           # URL 입력
+      ├─ scene-new.js         # 장면 추가 (선택 + 컨펌)
+      ├─ link-list.js         # 링크 전체 (월별)
+      └─ link-detail.js       # 링크 상세 (인앱 브라우저)
 ```
 
 ---
@@ -94,15 +97,17 @@ make-won-app/
 |----------|------|
 | `#/` | 런치 스크린 (약 3초 후 자동으로 `#/home`) |
 | `#/home` | 메인 (오늘 요약 + 캘린더) |
-| `#/memo` | 메모 전체 |
-| `#/memo/new` | 새 메모 작성 (`?date=YYYY-MM-DD` 쿼리로 날짜 지정 가능) |
+| `#/memo` | 메모 전체 (일별) |
+| `#/memo/new` | 새 메모 작성 (`?date=YYYY-MM-DD`로 날짜 지정 가능) |
 | `#/memo/:id` | 메모 상세 |
-| `#/scene` | 장면 3×3 그리드 |
-| `#/scene/new` | 장면 추가 (카메라/갤러리) |
+| `#/scene` | 장면 그리드 (일별) |
+| `#/scene/new` | 장면 추가 - 갤러리/카메라 선택 후 컨펌 |
 | `#/scene/:id` | 장면 전체화면 뷰 |
-| `#/url/new` | URL 입력 |
-| `#/url` | URL 전체 (기획 진행 중) |
+| `#/url` | 링크 전체 (월별) |
+| `#/url/:id` | 링크 상세 (인앱 브라우저) |
 | `#/settings` | 설정 (기획 진행 중) |
+
+링크 추가/수정은 별도 라우트 없이 시트(모달)로 처리합니다.
 
 ---
 
@@ -159,6 +164,7 @@ VS Code 확장 "Live Server"를 설치하고 `index.html` 우클릭 → "Open wi
 localStorage.removeItem('kyeokyeo.memos.v1');
 localStorage.removeItem('kyeokyeo.urls.v1');
 indexedDB.deleteDatabase('kyeokyeo');
+caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
 location.reload();
 ```
 
@@ -172,8 +178,9 @@ location.reload();
 | `--color-accent-deep` | `#5C52B8` | 타이틀, 포인트 |
 | `--color-accent` | `#7F77DD` | 액션 버튼, 활성 탭 |
 | `--color-tint` | `#EEEDFE` | 카드 배경, 도트 |
+| `--color-sunday` | `#E8736A` | 캘린더 일요일 |
 | `--color-badge-scene-bg` | `#E1F5EE` | 장면 뱃지 |
-| `--color-badge-url-bg` | `#E6F1FB` | URL 뱃지 |
+| `--color-badge-url-bg` | `#E6F1FB` | 링크 뱃지·카드 |
 | `--color-bg-scene` | `#2E2B3D` | 사진 전체화면 배경 |
 
 ---
@@ -184,14 +191,17 @@ location.reload();
 - 2차: 장면(사진/동영상) 기능 + IndexedDB 도입
 - 3차 a: 메인 화면에 오늘 기록 요약 영역 신설, URL 저장소, 바텀 시트
 - 로고: Lottie 애니메이션 통합
-- 3차 b (예정): URL 전체/상세, 캘린더 상세 화면
+- v1.2.1: 수정사항 반영 - 일요일 컬러, 탭바 아이콘, 자체 월 피커, 카드 높이 고정
+- v1.2.2: 데이트 피커를 캘린더 그리드로 (일자까지 선택)
+- v1.2.3: 메모/장면 탭을 일별 보기로 전환
+- v1.3: 기획서 v1.3 반영 - 링크 메뉴 신설(전체/상세/추가-수정 시트), 장면 추가 컨펌 단계, URL → 링크 명칭 통일
 
 ---
 
 ## 기획
 
 - 기획: 올리브
-- 기획서 버전: v1.2
+- 기획서 버전: v1.3
 
 ---
 

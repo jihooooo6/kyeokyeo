@@ -1,22 +1,41 @@
-/* 켜켜 - K_IOS_APP_GAL_002 장면 추가 (v1.2.1: 단일 진입점) */
+/* 켜켜 - K_IOS_APP_GAL_002/003 장면 추가 (v1.3: 미리보기 컨펌 단계 추가) */
 import { navigate } from '../router.js';
 import { renderTabbar, showToast } from '../app.js';
 import { MediaStore } from '../media-storage.js';
 import { todayISO } from '../date-utils.js';
 
+// 현재 화면의 미리보기 상태
+let pendingFile = null;
+let pendingType = null;
+let pendingUrl = null;
+let pendingDate = null;
+
+function clearPending() {
+  if (pendingUrl) {
+    try { URL.revokeObjectURL(pendingUrl); } catch (e) {}
+  }
+  pendingFile = null;
+  pendingType = null;
+  pendingUrl = null;
+  pendingDate = null;
+}
+
 /**
  * 장면 추가 화면
- * 기존 카메라/갤러리 두 버튼이 iOS 네이티브 메뉴(보관함/촬영/파일)와 중복돼서
- * 단일 진입점(`장면 추가하기`)으로 통합. accept="image/*,video/*" 만 두면
- * iOS가 알아서 보관함/촬영/파일을 골라서 띄움.
+ * 갤러리/카메라 선택 → 미리보기 화면(컨펌) → 저장 → 장면 탭으로 이동
  * @param {string} [dateParam] - 캘린더에서 날짜를 골라 진입한 경우의 ISO 날짜
  */
 export function renderSceneNew(dateParam) {
-  const targetDate = dateParam || todayISO();
+  clearPending();
+  pendingDate = dateParam || todayISO();
+  renderSelect();
+}
+
+function renderSelect() {
   const app = document.getElementById('app');
   app.innerHTML = `
     <div class="screen-scene-new screen">
-      <div class="scene-new-preview" id="preview-area">
+      <div class="scene-new-preview">
         <span class="preview-hint">선택한 장면이 여기에 표시됩니다</span>
       </div>
 
@@ -31,7 +50,7 @@ export function renderSceneNew(dateParam) {
               <path d="M21 15l-5-5L5 21"></path>
             </svg>
           </span>
-          <span class="label">장면 추가하기</span>
+          <span class="label">갤러리에서 가져오기</span>
           <input id="media-input" type="file" accept="image/*,video/*" hidden>
         </label>
 
@@ -45,11 +64,11 @@ export function renderSceneNew(dateParam) {
   `;
 
   document.getElementById('media-input').addEventListener('change', (e) => {
-    handleFile(e.target.files, targetDate);
+    handleFileSelected(e.target.files);
   });
 }
 
-async function handleFile(files, targetDate) {
+function handleFileSelected(files) {
   if (!files || !files[0]) return;
   const file = files[0];
   const type = file.type.startsWith('video/') ? 'video' :
@@ -59,23 +78,55 @@ async function handleFile(files, targetDate) {
     return;
   }
 
-  // 사용자에게 미리보기 즉시 제공
-  const previewUrl = URL.createObjectURL(file);
-  const preview = document.getElementById('preview-area');
-  preview.innerHTML = type === 'video'
-    ? `<video src="${previewUrl}" controls playsinline></video>`
-    : `<img src="${previewUrl}" alt="">`;
+  pendingFile = file;
+  pendingType = type;
+  pendingUrl = URL.createObjectURL(file);
 
+  renderConfirm();
+}
+
+// K_IOS_APP_GAL_003 - 선택한 사진/동영상 미리보기 + 취소/저장
+function renderConfirm() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="screen-scene-confirm screen no-tab">
+      <div class="scene-confirm-media">
+        ${pendingType === 'video'
+          ? `<video src="${pendingUrl}" controls playsinline></video>`
+          : `<img src="${pendingUrl}" alt="">`
+        }
+      </div>
+      <div class="scene-confirm-actions">
+        <button class="btn-outline" id="cancel-btn">취소</button>
+        <button class="btn-outline primary" id="save-btn">저장</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('cancel-btn').addEventListener('click', () => {
+    clearPending();
+    renderSelect();
+  });
+
+  document.getElementById('save-btn').addEventListener('click', saveAndExit);
+}
+
+async function saveAndExit() {
+  if (!pendingFile) return;
   try {
-    // 파일 자체를 그대로 Blob으로 저장 (File은 Blob의 서브클래스)
     await MediaStore.create({
-      date: targetDate,
-      type,
-      blob: file,
-      mimeType: file.type
+      date: pendingDate,
+      type: pendingType,
+      blob: pendingFile,
+      mimeType: pendingFile.type
     });
+    const savedUrl = pendingUrl;
+    pendingUrl = null; // revoke는 showToast 이후
+    clearPending();
     showToast('저장 되었습니다.', () => {
-      URL.revokeObjectURL(previewUrl);
+      if (savedUrl) {
+        try { URL.revokeObjectURL(savedUrl); } catch (e) {}
+      }
       navigate('/scene');
     });
   } catch (e) {
