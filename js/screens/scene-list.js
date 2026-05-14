@@ -1,15 +1,15 @@
-/* 켜켜 - K_IOS_APP_GAL_001 장면 전체 화면 (3×3 그리드) */
+/* 켜켜 - K_IOS_APP_GAL_001 장면 전체 화면 (v1.2.3: 일별 보기) */
 import { navigate } from '../router.js';
 import { renderTabbar } from '../app.js';
 import { MediaStore, blobToObjectURL, revokeObjectURL } from '../media-storage.js';
 import { openDatePicker } from '../components/date-picker.js';
 import {
-  shiftMonth,
-  todayYearMonth,
-  toMonthLabel
+  shiftDay,
+  todayISO,
+  toKoreanDate
 } from '../date-utils.js';
 
-let currentMonth = todayYearMonth();
+let currentDate = todayISO();
 
 // 화면 떠날 때 해제할 object URL 목록 (메모리 누수 방지)
 let activeUrls = [];
@@ -19,9 +19,9 @@ function clearActiveUrls() {
   activeUrls = [];
 }
 
-// 외부 진입(라우트 매칭)용 - currentMonth를 오늘 기준으로 리셋
+// 외부 진입(라우트 매칭)용 - currentDate를 오늘로 리셋
 export function renderSceneList() {
-  currentMonth = todayYearMonth();
+  currentDate = todayISO();
   return paint();
 }
 
@@ -35,12 +35,12 @@ async function paint() {
         <div class="title">장면</div>
         <div style="width:24px"></div>
       </div>
-      <div class="month-nav">
-        <button class="chev-btn" id="prev-month" aria-label="이전 달">
+      <div class="day-nav">
+        <button class="chev-btn" id="prev-day" aria-label="이전 일">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        <div class="month-label" id="month-label">${toMonthLabel(currentMonth)}</div>
-        <button class="chev-btn" id="next-month" aria-label="다음 달">
+        <div class="day-label" id="day-label">${toKoreanDate(currentDate)}</div>
+        <button class="chev-btn" id="next-day" aria-label="다음 일">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
       </div>
@@ -50,32 +50,32 @@ async function paint() {
     ${renderTabbar()}
   `;
 
-  document.getElementById('prev-month').addEventListener('click', () => {
-    currentMonth = shiftMonth(currentMonth, -1);
+  document.getElementById('prev-day').addEventListener('click', () => {
+    currentDate = shiftDay(currentDate, -1);
     paint();
   });
-  document.getElementById('next-month').addEventListener('click', () => {
-    currentMonth = shiftMonth(currentMonth, 1);
+  document.getElementById('next-day').addEventListener('click', () => {
+    currentDate = shiftDay(currentDate, 1);
     paint();
   });
-  document.getElementById('month-label').addEventListener('click', () => {
-    openDatePicker(currentMonth + '-01', (iso) => {
-      currentMonth = iso.substring(0, 7);
+  document.getElementById('day-label').addEventListener('click', () => {
+    openDatePicker(currentDate, (iso) => {
+      currentDate = iso;
       paint();
     });
   });
   document.getElementById('add-scene').addEventListener('click', () => {
-    navigate('/scene/new');
+    navigate('/scene/new?date=' + encodeURIComponent(currentDate));
   });
 
-  // 현재 월의 미디어 비동기 로드 후 그리드 렌더링
+  // 현재 일자의 미디어 비동기 로드 후 그리드 렌더링
   let items;
   try {
-    items = await MediaStore.listByMonth(currentMonth);
+    items = await MediaStore.listByDate(currentDate);
   } catch (e) {
     console.error('[scene-list]', e);
-    document.getElementById('scene-body').innerHTML =
-      '<div class="empty-state">불러오기에 실패했어요</div>';
+    const body = document.getElementById('scene-body');
+    if (body) body.innerHTML = '<div class="empty-state">불러오기에 실패했어요</div>';
     return;
   }
 
@@ -83,7 +83,7 @@ async function paint() {
   if (!body) return; // 화면이 이미 다른 데로 넘어갔으면 무시
 
   if (items.length === 0) {
-    body.outerHTML = `<div class="empty-state">이 달의 장면이 없어요</div>`;
+    body.outerHTML = `<div class="empty-state">이 날의 장면이 없어요</div>`;
     return;
   }
 

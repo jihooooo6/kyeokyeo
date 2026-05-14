@@ -107,6 +107,27 @@ export const MediaStore = {
     });
   },
 
+  // 특정 일자(YYYY-MM-DD)의 미디어 (createdAt 내림차순)
+  async listByDate(iso) {
+    const store = await tx();
+    return new Promise((resolve, reject) => {
+      const items = [];
+      const cursorReq = store.openCursor();
+      cursorReq.onerror = () => reject(cursorReq.error);
+      cursorReq.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (!cursor) {
+          items.sort((a, b) => b.createdAt - a.createdAt);
+          resolve(items);
+          return;
+        }
+        const v = cursor.value;
+        if (v.date === iso) items.push(v);
+        cursor.continue();
+      };
+    });
+  },
+
   // 기록(미디어) 있는 날짜 집합 - 캘린더 도트 표시용
   async recordedDatesInMonth(yyyymm) {
     const items = await this.listByMonth(yyyymm);

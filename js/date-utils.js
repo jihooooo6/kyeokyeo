@@ -44,6 +44,13 @@ export function shiftMonth(yyyymm, delta) {
   return toYearMonth(date);
 }
 
+// 일 이동: YYYY-MM-DD + delta(일)
+export function shiftDay(iso, delta) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const date = new Date(y, m - 1, d + delta);
+  return toISODate(date);
+}
+
 /**
  * 캘린더 그리드(월-일 7열) 계산
  * 기획서: 월 화 수 목 금 토 일 (월요일 시작)

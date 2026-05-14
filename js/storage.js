@@ -36,6 +36,11 @@ export const MemoStore = {
     return this.list().filter((m) => m.date.startsWith(yyyymm));
   },
 
+  // 특정 일자(YYYY-MM-DD)의 메모 목록 (최근 작성 순)
+  listByDate(iso) {
+    return this.list().filter((m) => m.date === iso);
+  },
+
   // 특정 ID의 메모 단건 조회
   get(id) {
     return loadAll().find((m) => m.id === id) || null;

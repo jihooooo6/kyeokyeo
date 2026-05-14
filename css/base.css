@@ -93,6 +93,31 @@ input:focus, textarea:focus {
   letter-spacing: 0.3px;
 }
 
+/* 일 네비게이션 (v1.2.3 - 메모/장면 탭 일별 보기) */
+.day-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  font-size: 16px;
+  color: var(--color-ink);
+}
+
+.day-nav .day-label {
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 140px;
+  text-align: center;
+  color: var(--color-accent-deep);
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+
+.day-nav .day-label:hover {
+  color: var(--color-accent);
+}
+
 /* 공통 chevron 버튼 (월 네비, 디테일 헤더 등) */
 .chev-btn {
   width: 36px;
